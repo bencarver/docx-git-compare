@@ -138,14 +138,22 @@ extract "$OLD" "$OLDF"; extract "$NEW" "$NEWF"
 
 [ -n "$OUT" ] || OUT="$DIR/$STEM-COMPARE-$(tag "$OLD")-vs-$(tag "$NEW").$EXT"
 
-# Word is sandboxed, and it asks for access per folder. Inside its own container it needs no
-# permission at all, so do the whole compare there and move the result out with the shell —
-# that way Word never touches a folder it has to ask about. The path is fixed, not per-run:
-# a unique staging folder would re-prompt every single time.
-WORDBOX="$HOME/Library/Containers/com.microsoft.Word/Data"
-if [ -d "$WORDBOX" ]; then STAGE="$WORDBOX/gitcompare"; else STAGE="$DIR/.gitcompare"; fi
-rm -rf "$STAGE"; mkdir -p "$STAGE"
-trap 'rm -rf "$TMP" "$STAGE"' EXIT
+# The staging folder has three constraints at once, and only one location satisfies all of
+# them. Word must be able to open files there, which rules out /var/folders — its sandbox
+# will not reliably open that. The Finder service must be able to create it, which rules out
+# Word's own container: an Automator service is not permitted to write into another app's
+# container, even though a Terminal with Full Disk Access can. And the path must be FIXED,
+# because Word grants folder access per folder — a per-run name re-prompts every single time.
+# A fixed hidden folder in the home directory meets all three: no TCC protection, so any
+# process can create it, and one Word grant covers it forever.
+STAGE="$HOME/.gitcompare/staging"
+mkdir -p "$STAGE" || die "Could not create the staging folder at $STAGE."
+# Empty the folder but never delete the folder itself. Word's access grant attaches to this
+# directory, so removing and recreating it would make Word ask for permission again on every
+# run — the same bug as a per-run path, arrived at from a different direction.
+clear_stage() { find "$STAGE" -mindepth 1 -delete 2>/dev/null || true; }
+clear_stage
+trap 'clear_stage; rm -rf "$TMP"' EXIT
 cp "$OLDF" "$STAGE/"; cp "$NEWF" "$STAGE/"
 STAGED_OUT="$STAGE/$(basename "$OUT")"
 

@@ -79,17 +79,28 @@ edits landing in one "Check in outstanding work" commit are one version here.
 filename, so if you amend or rebase, the SHAs in filenames from before the rewrite no
 longer resolve. Regenerating is cheap; there is nothing to repair.
 
-Versions are extracted to a temp directory, then staged in
-`~/Library/Containers/com.microsoft.Word/Data/gitcompare` — inside Word's own sandbox
-container, which it can read and write without asking anyone. The redline is written there
-too and moved into place afterwards by the shell, so Word never touches a folder outside
-its container and never has to prompt.
+Versions are extracted to a temp directory, then staged in `~/.gitcompare/staging`, and the
+redline is written there and moved into place afterwards by the shell.
 
-**The staging path has to be fixed, not per-run.** It was originally `.gitcompare-$$`
-beside the document, which meant a different directory on every invocation. Word grants
-folder access per folder, so a unique name defeated the grant and re-prompted every single
-time. `/var/folders` is not an option either — Word's sandbox will not reliably open files
-there. The staging folder is removed on exit, including on failure.
+**That location is the only one that satisfies all three constraints, and each one rules out
+an obvious alternative:**
+
+| Constraint | What it rules out |
+| --- | --- |
+| Word's sandbox must be able to open the files | `/var/folders` — Word will not reliably open there |
+| The Finder service must be able to create the folder | Word's own container. An Automator service is *not permitted* to write into another app's container, and fails with `Operation not permitted`. A Terminal with Full Disk Access can, which makes this trivially easy to "verify" from the command line and still ship broken |
+| The path must never change | Anything with `$$`, `mktemp`, or a per-document folder in it. Word grants folder access **per folder**, so a fresh path re-prompts on every single run |
+
+A fixed hidden folder in the home directory meets all three: no TCC protection, so any process
+can create it, and one Word grant covers it for good.
+
+The folder is emptied between runs but never deleted and recreated. Word's grant attaches to
+the directory, so removing it would trigger a fresh prompt every run — the same bug as a
+per-run path, reached from a different direction.
+
+The lesson generalises. The command line and the Finder service are different security
+contexts, and the service is the one that matters. Test changes to staging or file access
+through the actual right-click, not through the CLI.
 
 In `--gui` mode every failure becomes a dialog, since nothing launched from Finder has a
 stderr anyone will read.
