@@ -154,10 +154,17 @@ mkdir -p "$STAGE" || die "Could not create the staging folder at $STAGE."
 clear_stage() { find "$STAGE" -mindepth 1 -delete 2>/dev/null || true; }
 clear_stage
 trap 'clear_stage; rm -rf "$TMP"' EXIT
-cp "$OLDF" "$STAGE/"; cp "$NEWF" "$STAGE/"
-STAGED_OUT="$STAGE/$(basename "$OUT")"
+# Word's access grant is keyed to the FILE PATH, not the folder, so the staged names must be
+# constant too. Naming them after the source document meant three paths Word had never seen
+# every time a different document was compared, and so a fresh prompt every time. With fixed
+# names Word only ever opens these three paths and one grant covers every document forever.
+# The real output name is restored by the mv at the end.
+STAGED_OLD="$STAGE/original.$EXT"
+STAGED_NEW="$STAGE/revised.$EXT"
+STAGED_OUT="$STAGE/compared.$EXT"
+cp "$OLDF" "$STAGED_OLD"; cp "$NEWF" "$STAGED_NEW"
 
-"$WORDCOMPARE" "$STAGE/$(basename "$OLDF")" "$STAGE/$(basename "$NEWF")" "$STAGED_OUT" -a "$AUTHOR" \
+"$WORDCOMPARE" "$STAGED_OLD" "$STAGED_NEW" "$STAGED_OUT" -a "$AUTHOR" \
   || die "Word's Compare failed. Is Microsoft Word installed?"
 
 [ -f "$STAGED_OUT" ] || die "The comparison produced no output."

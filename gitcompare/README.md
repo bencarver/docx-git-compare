@@ -89,14 +89,19 @@ an obvious alternative:**
 | --- | --- |
 | Word's sandbox must be able to open the files | `/var/folders` — Word will not reliably open there |
 | The Finder service must be able to create the folder | Word's own container. An Automator service is *not permitted* to write into another app's container, and fails with `Operation not permitted`. A Terminal with Full Disk Access can, which makes this trivially easy to "verify" from the command line and still ship broken |
-| The path must never change | Anything with `$$`, `mktemp`, or a per-document folder in it. Word grants folder access **per folder**, so a fresh path re-prompts on every single run |
+| The paths must never change | Anything with `$$`, `mktemp`, or a per-document name in it. Word's grant is keyed to the **file path**, so any new path re-prompts |
 
 A fixed hidden folder in the home directory meets all three: no TCC protection, so any process
 can create it, and one Word grant covers it for good.
 
-The folder is emptied between runs but never deleted and recreated. Word's grant attaches to
-the directory, so removing it would trigger a fresh prompt every run — the same bug as a
-per-run path, reached from a different direction.
+Two consequences of the grant being path-keyed, both of which caused a round of re-prompting
+before being fixed:
+
+- The folder is emptied between runs, never deleted and recreated.
+- The staged files are always `original.docx`, `revised.docx` and `compared.docx`, never named
+  after the source document. Word therefore only ever opens three paths in its entire life,
+  and one grant covers every document you will ever compare. The real output name is restored
+  by a `mv` once Word is done.
 
 The lesson generalises. The command line and the Finder service are different security
 contexts, and the service is the one that matters. Test changes to staging or file access
