@@ -130,10 +130,11 @@ echo "installed: $WF"
 # Registration is asynchronous; pbs needs a moment before it will admit the service exists.
 for _ in 1 2 3 4 5 6 7 8 9 10; do
   if /System/Library/CoreServices/pbs -dump_pboard 2>/dev/null | grep -q "Compare Versions"; then
-    echo "registered with the Services system — right-click a .docx in Finder > Quick Actions."
+    echo "registered — right-click a .docx in Finder > Services > Compare Versions."
     exit 0
   fi
   sleep 1
 done
 echo "note: not visible to pbs yet. It usually appears within a minute, or after" >&2
-echo "      killall Finder. Check System Settings > Keyboard > Keyboard Shortcuts > Services." >&2
+echo "      killall Finder. Reinstalling over an existing copy needs a Finder restart" >&2
+echo "      before the change takes effect." >&2
