@@ -23,7 +23,9 @@ global one. Your name will not appear in Word's markup.
 | File | What it is |
 | --- | --- |
 | `redline-page-1.png` | **A real render** of the actual output — page 1 of the demo redline, insertions underlined, deletions struck through, change bars in the margin. Produced by `render-redline.sh`, no screen capture involved |
-| `flow.svg` / `flow.png` | **An illustration** of the three-step flow, drawn to depict the Finder menu and the picker dialog. Accurate, but not a capture, and it says so in the corner |
+| `finder-right-click.png` | **A real screenshot** of the Finder context menu, taken on the demo folder |
+| `version-picker.png` | **A real screenshot** of the version picker listing the four demo commits |
+| `flow.svg` | An illustration of the same flow, kept only as a diagram source. Superseded by the two screenshots above; do not pass it off as a capture |
 
 Regenerate the redline render at any time:
 

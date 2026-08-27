@@ -66,6 +66,9 @@ fi
 while IFS= read -r line; do
   case "$line" in
     C*) IFS=$'\037' read -r _ sha adate aname subj <<<"$line"; pending_sha=$sha
+        # strftime's %e space-pads single-digit days, which shows up as a visible gap in a
+        # proportional font ("Mar  4, 2026"). Squeeze it.
+        adate="${adate//  / }"
         pending_label="$adate — $subj  [${sha:0:7}, $aname]" ;;
     "") ;;
     *)  if [ -n "${pending_sha:-}" ]; then

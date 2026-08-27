@@ -12,11 +12,15 @@ real tracked-changes document you can accept, reject and comment on like any oth
 
 Two tools, one of which uses the other:
 
-![How it works](demo/assets/flow.png)
+![Right-click a .docx in Finder and choose Services > Compare Versions](demo/assets/finder-right-click.png)
 
-*Illustration of the interface. The redline below is a real render of the tool's output.*
+Pick any two versions out of the document's own commit history:
 
-![A redline of the demo NDA](demo/assets/redline-page-1.png)
+![The version picker, listing four commits by date and commit message](demo/assets/version-picker.png)
+
+And Word's own redline lands next to the original:
+
+![A redline of the demo NDA, insertions underlined and deletions struck through](demo/assets/redline-page-1.png)
 
 | | |
 | --- | --- |
