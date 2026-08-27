@@ -1,3 +1,6 @@
 .DS_Store
 *-COMPARE-*.docx
 *-WORDCOMPARE.docx
+
+# Reddit post draft, not part of the tool
+reddit-post-draft.md
