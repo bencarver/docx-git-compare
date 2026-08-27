@@ -25,11 +25,14 @@ git init -q -b main
 git config user.name "A. Lawyer"
 git config user.email "lawyer@example.com"
 
+# A .docx is a zip; git must never try to merge or reflow one.
+printf '*.docx binary\n' > .gitattributes
+
 # Four versions, backdated so the picker shows a realistic spread of dates. The parties are
 # Microsoft's stock fictional companies, so nobody mistakes this for a real agreement.
 commit() { # version_file  date  message
   cp "$HERE/versions/$1" "$DOC"
-  git add "$DOC"
+  git add "$DOC" .gitattributes
   GIT_AUTHOR_NAME="A. Lawyer" GIT_AUTHOR_EMAIL="lawyer@example.com" \
   GIT_COMMITTER_NAME="A. Lawyer" GIT_COMMITTER_EMAIL="lawyer@example.com" \
   GIT_AUTHOR_DATE="$2" GIT_COMMITTER_DATE="$2" \

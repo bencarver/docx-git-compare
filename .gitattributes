@@ -1,0 +1,4 @@
+# A .docx is a zip archive, so git must never try to merge or reflow it.
+*.docx binary
+*.doc  binary
+*.pdf  binary

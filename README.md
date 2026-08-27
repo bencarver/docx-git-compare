@@ -27,6 +27,45 @@ And Word's own redline lands next to the original:
 | [**gitcompare**](gitcompare/) | Redline a document against its own earlier versions in git. Finder right-click, or CLI. |
 | [**wordcompare**](wordcompare/) | Drive Microsoft Word's Compare (Legal Blackline) between any two files, from the shell. |
 
+## New to git?
+
+Git keeps a permanent history of files in a folder. You save a version by "committing" it
+with a one-line note about what changed — "first markup, made it mutual" — and git keeps
+every version you ever committed, forever, alongside who committed it and when. Nothing is
+overwritten and nothing needs a filename like `v3-FINAL-really.docx`.
+
+What git will not do is tell a Word user what actually changed between two versions, because
+`git diff` on a `.docx` says only "binary files differ". That is the gap this fills: the
+history comes from git, the redline comes from Word.
+
+## Does git need anything special for .docx?
+
+No. It works out of the box.
+
+A `.docx` is a zip archive of XML, so git treats it as binary and stores a complete copy of
+each version rather than a compact record of what changed. For contracts that is a non-issue
+— a 40-page agreement is well under 100 KB, so a hundred versions is a few megabytes.
+
+Two things are worth knowing:
+
+- **Add a `.gitattributes`** marking `*.docx binary`, as this repo does. Git detects it
+  anyway, but saying so explicitly also switches off git's merge and line-ending handling for
+  those files, neither of which can do anything but corrupt a zip. Cheap insurance.
+- **Never merge branches that both changed the same document.** There is no sensible
+  automatic merge for a Word file. Git will stop and make you choose one, which is the right
+  answer.
+
+If you want a readable `git diff` on the command line as well, point git at a text converter:
+
+```bash
+printf '*.docx diff=word\n' >> .gitattributes
+git config diff.word.textconv "pandoc --to=plain"
+git config diff.word.binary false
+```
+
+`git diff` then shows the prose that changed. It is good for a quick look, and no substitute
+for a real redline — it has no notion of tracked changes and nothing you can accept or reject.
+
 ## Requirements
 
 macOS and Microsoft Word. Word does the actual comparison over AppleScript, so there is no
