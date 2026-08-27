@@ -12,6 +12,12 @@ real tracked-changes document you can accept, reject and comment on like any oth
 
 Two tools, one of which uses the other:
 
+![How it works](demo/assets/flow.png)
+
+*Illustration of the interface. The redline below is a real render of the tool's output.*
+
+![A redline of the demo NDA](demo/assets/redline-page-1.png)
+
 | | |
 | --- | --- |
 | [**gitcompare**](gitcompare/) | Redline a document against its own earlier versions in git. Finder right-click, or CLI. |

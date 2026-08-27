@@ -16,6 +16,28 @@ Redlines generated from that repo are attributed to "A. Lawyer", because the rep
 its own `user.name` and `gitcompare` reads the document repo's config rather than your
 global one. Your name will not appear in Word's markup.
 
+## Ready-made images
+
+`demo/assets/` holds two things, and they are not the same kind of artifact:
+
+| File | What it is |
+| --- | --- |
+| `redline-page-1.png` | **A real render** of the actual output — page 1 of the demo redline, insertions underlined, deletions struck through, change bars in the margin. Produced by `render-redline.sh`, no screen capture involved |
+| `flow.svg` / `flow.png` | **An illustration** of the three-step flow, drawn to depict the Finder menu and the picker dialog. Accurate, but not a capture, and it says so in the corner |
+
+Regenerate the redline render at any time:
+
+```bash
+./demo/make-demo-repo.sh
+./gitcompare/gitcompare.sh ~/docx-git-compare-demo/Mutual-NDA-Northwind-Contoso.docx --pick 2,3
+./demo/render-redline.sh ~/docx-git-compare-demo/Mutual-NDA-*-COMPARE-*.docx demo/assets
+```
+
+`render-redline.sh` goes through LibreOffice rather than Word on purpose. Word's AppleScript
+`save as ... format PDF` exports the document as though every change had been accepted, and
+it ignores `print revisions` on the document and `show revisions and comments` on the window
+even when both read back as `true`. LibreOffice renders the markup properly.
+
 ## Recording it
 
 `screencapture` needs Screen Recording permission, granted per app in
