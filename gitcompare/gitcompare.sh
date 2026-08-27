@@ -13,12 +13,7 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 WORDCOMPARE="$HERE/../wordcompare/wordcompare.sh"
 
-# Tracked changes need an author name. Take the user's own, not the packager's.
-default_author() {
-  git config --get user.name 2>/dev/null || echo "${USER:-Compare}"
-}
-
-GUI=0; LIST=0; PICK=""; AUTHOR=$(default_author); OUT=""; FILE=""
+GUI=0; LIST=0; PICK=""; AUTHOR=""; OUT=""; FILE=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --gui) GUI=1; shift ;;
@@ -50,6 +45,14 @@ DIR=$(dirname "$FILE"); BASE=$(basename "$FILE"); STEM="${BASE%.*}"; EXT="${BASE
 ROOT=$(git -C "$DIR" rev-parse --show-toplevel 2>/dev/null) \
   || die "$BASE is not inside a git repository, so it has no version history."
 REL=$(python3 -c 'import os,sys;print(os.path.relpath(sys.argv[1],sys.argv[2]))' "$FILE" "$ROOT")
+
+# Tracked changes need an author name. Resolve it from the config of the repo the document
+# lives in, so a repo with its own user.name (a demo repo, a client-specific checkout) gets
+# that name rather than whatever is set globally. -a overrides.
+if [ -z "$AUTHOR" ]; then
+  AUTHOR=$(git -C "$ROOT" config --get user.name 2>/dev/null || true)
+  : "${AUTHOR:=${USER:-Compare}}"
+fi
 
 # --- build the version list, newest first -------------------------------------
 SHAS=(); PATHS=(); LABELS=()

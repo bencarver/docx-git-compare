@@ -41,6 +41,12 @@ late and quietly, and the compare sits blocked behind it, so if the first run ap
 or reports `AppleEvent timed out`, go find the prompt and click Allow. Once granted it stays
 granted.
 
+## Demo
+
+`demo/make-demo-repo.sh` builds a throwaway repo containing a fabricated NDA between two
+fictional companies, committed four times, so you can try the tool — or record it — without
+touching a real document. See [demo/README.md](demo/README.md).
+
 ## Command line
 
 The Finder right-click is the point of it, but everything works from the shell too:
