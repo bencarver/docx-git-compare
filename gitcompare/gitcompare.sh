@@ -75,7 +75,10 @@ while IFS= read -r line; do
           SHAS+=("$pending_sha"); PATHS+=("$line"); LABELS+=("$pending_label"); pending_sha=""
         fi ;;
   esac
-done < <(git -C "$ROOT" log --follow --name-only \
+# --follow also hunts for copies at git's default 50% similarity. Documents built from the
+# same Word template share their styles, theme and media, so a new .docx scores 50-66% against
+# unrelated ones and inherits their history. -M90% keeps pure renames (R100) and drops those.
+done < <(git -C "$ROOT" log --follow -M90% --name-only \
            --format="C%x1f%H%x1f%ad%x1f%an%x1f%s" --date=format:'%b %e, %Y' -- "$REL")
 
 N=${#LABELS[@]}
