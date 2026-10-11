@@ -65,7 +65,10 @@ fi
 
 while IFS= read -r line; do
   case "$line" in
-    C*) IFS=$'\037' read -r _ sha adate aname subj <<<"$line"; pending_sha=$sha
+    # The header is "C" plus the 0x1f separator. Matching on "C*" alone also caught --name-only
+    # path lines that start with a capital C (CLAUDE.md, Colorado-...), which blanked pending_sha
+    # and dropped the commit.
+    C$'\037'*) IFS=$'\037' read -r _ sha adate aname subj <<<"$line"; pending_sha=$sha
         # strftime's %e space-pads single-digit days, which shows up as a visible gap in a
         # proportional font ("Mar  4, 2026"). Squeeze it.
         adate="${adate//  / }"
